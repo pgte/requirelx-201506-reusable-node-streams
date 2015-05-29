@@ -39,9 +39,13 @@ http://nodepatternsbooks.com
 
 # Agenda
 
-* Node Streams 101
-* Error Handling
-* Back-pressure
-* Creating a stream
-* Example in the browser
+* 1st part: Slides
+  - Node Streams 101
+* 2nd Part: Code
+  - Back-pressure
+  - Creating a stream
+  - Edge cases
+    + Error Handling
+    + multiple destinations 
+  - Example in the browser
 

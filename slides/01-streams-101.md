@@ -189,6 +189,8 @@ target.end(chunk);
 
 ## Finishing
 
+![Finish](images/finish.gif)
+
 After ending it and all data has been flushed, a writable stream emits the `finish` event:
 
 ```js
@@ -198,5 +200,100 @@ target.end();
 
 target.once('finish', function() {
   console.log('all writes are now complete!');
+});
+```
+
+
+![Duplex streams](images/duplex_streams.png)
+
+
+# Duplex streams
+
+Are both readable and writable.
+
+Examples:
+
+* TCP connection
+* websocket connection
+* ...
+
+
+# What is this?
+
+```js
+require('net').createServer(function(conn) {
+  conn.pipe(conn);
+}).listen(port);
+```
+
+
+# Pipe
+
+![Pipe](images/pipe.gif)
+
+
+# Pipe
+
+```js
+source.pipe(dest);
+```
+
+Looks simple, but it's not. Behind the scenes it does:
+
+* Ending
+* Error handling
+* Flow control
+* Encoding / decoding
+
+
+# Transform Streams
+
+Is readable and writable.
+
+You can use to adapt encodings, formats or types:
+
+```js
+source.pipe(transform).pipe(dest);
+```
+
+
+Example:
+
+```js
+require('net').createServer(function(conn) {
+  var uppercasing = Uppercasing();
+  conn.pipe(uppercasing).pipe(conn);
+}).listen(port);
+```
+
+
+Or implement protocols
+
+Example:
+
+```js
+var RPC = require('rpc');
+var service = require('./service');
+
+require('net').createServer(function(conn) {
+  conn.pipe(RPC(service)).pipe(conn);
+}).listen(port);
+```
+
+
+A pipe chain:
+
+```js
+var NLJSON = require('newline-json')
+var Parser = NLJSON.Parser;
+var Stringifier = NLJSON.Stringifier;
+var Service = require('./service');
+
+require('net').createServer(function(conn) {
+    conn
+      .pipe(new Parser())
+      .pipe(Service())
+      .pipe(new Stringifier())
+      .pipe(conn);
 });
 ```
