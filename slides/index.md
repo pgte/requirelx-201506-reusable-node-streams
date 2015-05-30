@@ -1,3 +1,10 @@
+## require('lx')
+
+# Node Reusable Streams
+
+2015/06/03
+
+
 https://pgte.github.io/requirelx-201506-reusable-node-streams
 
 
@@ -33,6 +40,7 @@ http://nodepatternsbooks.com
 # Why this presentation
 
 * Node != Express
+* Streams are awesome
 * Streams are source of much confusion
 * Streams are not used enough
 
@@ -40,12 +48,39 @@ http://nodepatternsbooks.com
 # Agenda
 
 * 1st part: Slides
+  - Why streams 
   - Node Streams 101
 * 2nd Part: Code
-  - Back-pressure
   - Creating a stream
+  - Back-pressure
   - Edge cases
     + Error Handling
     + multiple destinations 
   - Example in the browser
 
+
+
+
+# Why streams
+
+
+# Universal interface
+
+![Lego](images/lego.jpg)
+
+
+# Fool-proof
+
+![Floating](images/floating.gif)
+
+Flow management (back-pressure) by default.
+
+
+# Memory-efficient
+
+![NBF](imageS/nbf.png)
+
+
+# Yet
+
+Paradoxically, Streams are the subject of some confusion and sometimes hard to get right.
