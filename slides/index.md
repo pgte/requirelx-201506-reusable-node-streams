@@ -54,6 +54,7 @@ http://nodepatternsbooks.com
   - Creating a stream
   - Back-pressure
   - Edge cases
+    + Encoding transformations in pipes
     + Error Handling
     + multiple destinations 
   - Example in the browser
