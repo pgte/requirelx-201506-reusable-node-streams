@@ -183,14 +183,14 @@ writable.write(new Buffer('beep boop'));
 I get whatever is written by the client.
 
 
-# Encoing on Write Streams
+# Encoding on Write Streams
 
 ## TLDR;
 
 > always passes in buffers, unless `options.decodeStrings` is `false`, in which case it passes whatever the client passes.
 
 
-# Encoing on Write Streams
+# Encoding on Write Streams
 
 ...which means that, if `options.decodeStrings` is `false`, you probably have to:
 
@@ -198,12 +198,164 @@ I get whatever is written by the client.
 * perform your own transcoding
 
 
+
 # Error-handling
 
 
+## 1)
 
-# Piping from many
+On read streams
+
+1) What happens if a read stream emits an error?
+
+```js
+var Readable = require('stream').Readable;
+
+var readable = new Readable();
+
+readable._read = function() {
+  setTimeout(function() {
+    readable.push(new Buffer('some buffer'));
+  }, 100);
+};
+
+['end', 'finish', 'close', 'data', 'error'].forEach(function(event) {
+  readable.on(event, function() {
+    if (event == 'data') {
+      process.stdout.write('D');
+    }
+    else {
+      console.log('\nevent: ', event, arguments);
+    }
+  });
+});
+
+setTimeout(function() {
+  readable.emit('error', new Error('hey'));
+}, 2e3);
+```
+
+
+It doesn't end the stream.
+
+
+## 2)
+
+On write streams
+
+```js
+var Writable = require('stream').Writable;
+
+var writable = new Writable();
+
+writable._write = function(chunk, encoding, callback) {
+  process.stdout.write('W');
+  setImmediate(callback);
+};
+
+
+['finish', 'error'].forEach(function(event) {
+  writable.on(event, function() {
+    console.log('\nevent: ', event, arguments);
+  });
+});
+
+setInterval(function() {
+  writable.write('hey');
+}, 100);
+
+setTimeout(function() {
+  writable.emit('error', new Error('hey'));
+}, 2e3);
+```
+
+
+By default, emitting an error on a write stream makes nothing extraordinary happen.
+
+
+## 3)
+
+...on write streams you're piping into.
+
+```js
+var readable = require('./readable');
+var writable = require('./writable');
+
+['finish', 'error', 'pipe', 'unpipe'].forEach(function(event) {
+  writable.on(event, function() {
+    console.log('\nwritable event: ', event);
+  });
+});
+
+['end', 'error'].forEach(function(event) {
+  readable.on(event, function() {
+    console.log('\nreadable event: ', event, arguments);
+  });
+});
+
+readable.pipe(writable);
+
+setTimeout(function() {
+  writable.emit('error', new Error('hey'));
+}, 2e3);
+```
+
+
+> When a writable stream emits an error, all the sources get unpiped.
+
+
+## 4)
+
+...on a pipe chain:
+
+```js
+var readable = require('./readable');
+var transform = require('./transform');
+var writable = require('./writable');
+
+['finish', 'error', 'pipe', 'unpipe'].forEach(function(event) {
+  writable.on(event, function() {
+    console.log('\nwritable event: ', event);
+  });
+});
+
+['finish', 'error', 'pipe', 'unpipe', 'end'].forEach(function(event) {
+  transform.on(event, function() {
+    console.log('\ntransform event: ', event);
+  });
+});
+
+['end', 'error'].forEach(function(event) {
+  readable.on(event, function() {
+    console.log('\nreadable event: ', event, arguments);
+  });
+});
+
+readable.pipe(transform).pipe(writable);
+
+setTimeout(function() {
+  writable.emit('error', new Error('hey'));
+}, 2e3);
+```
+
+
+Only the pipe right before gets unpiped.
+
+
+## Ending
+
+
+## Piping
+
+## Piping from many
+
+## Piping to many
+
+
+# Ending
+
+## Piping from many
 
 
 
-# Piping to many
+## Piping to many
