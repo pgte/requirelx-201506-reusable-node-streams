@@ -56,7 +56,7 @@ http://nodepatternsbooks.com
   - Edge cases
     + Encoding transformations in pipes
     + Error Handling
-    + multiple destinations 
+    + multiple pipe destinations 
   - Example in the browser
 
 
