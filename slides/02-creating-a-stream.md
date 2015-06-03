@@ -1,4 +1,4 @@
-# Creating a stream
+# 2. How to Create Streams
 
 
 # Creating a Read Stream
@@ -34,12 +34,11 @@ var hardware = require('./hardware');
 inherits(Readable, Thermometer);
 
 function Thermometer(options) {
-  options = extend({}, options || {});
-
-  options.objectModel = true;
+  options = extend({
+    objectModel: true
+  }, options || {});
 
   Readable.call(this, options);
-
   hardware.init();
 }
 ```
@@ -54,8 +53,8 @@ Thermometer.prototype._read = function _read() {
       thermometer.emit('error', err);
     }
     else {
-      self.push({
-        when: Date(),
+      thermometer.push({
+        when: Date.now(),
         value: result,
         units: 'Celcius'
       });
@@ -91,8 +90,9 @@ var extend = require('util')._extend;
 inherits(Readable, LogWriter);
 
 function LogWriter(options) {
-  options = extend({}, options || {});
-  options.objectMode = true;
+  options = extend({
+    objectMode: true
+  }, options || {});
   Readable.call(this, options);
 
   this._client = new elasticsearch.Client({
@@ -101,8 +101,15 @@ function LogWriter(options) {
 }
 
 LogWriter.prototype._write = function(entry, encoding, callback) {
-  this._client.insert(LogWriter.prototype._decorate(entry), callback);
+  this._client.insert(this._decorate(entry), callback);
 };
+
+LogWriter.prototype._decorate = function(entry) {
+  return {
+    when: Date.now(),
+    what: entry
+  };
+}
 ```
 
 

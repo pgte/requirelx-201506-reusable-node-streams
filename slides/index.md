@@ -17,17 +17,7 @@ $ whoami
 {
   "name": "Pedro Teixeira",
   "github": "@pgte",
-  "twitter": "@pgte",
-  "programming since": 1985,
-  "profesh programming since": 1997,
-  "using node since": "v0.1 (late 2009)",
-  "profesh using node since": "v0.2 (2011)",
-  "lives at": "Funchal",
-  "job": "Partner and Director at YLD! (http://yld.io)",
-  "works at": ["Home", "London", "Lisbon", "Internets"],
-  "creator of", ["Node Tuts", "LXJS"],
-  "published books about node": 10,
-  "published NPM modules": 72
+  "twitter": "@pgte"
 }
 ```
 
@@ -63,8 +53,26 @@ http://nodepatternsbooks.com
 
 
 
+![Answer Boy](images/answer-boy.gif)
 
-# Why streams
+Please interrupt
+
+I hate talking alone ;)
+
+
+
+# -1. Show hands
+
+![Show hands](images/hands.jpg)
+
+Who has:
+
+* Used Node
+* Used Node Streams
+* App in production using Node streams
+
+
+# 0. Why streams
 
 
 # Universal interface

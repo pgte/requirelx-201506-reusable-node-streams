@@ -7,6 +7,7 @@ module.exports = function() {
   });
 
   source._read = function() {
+    // mock log entries
     var entry = {when: Date.now(), what: "some log string"};
     source.push(entry);
     console.log('pushed', entry);

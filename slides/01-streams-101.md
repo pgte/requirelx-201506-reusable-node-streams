@@ -1,4 +1,4 @@
-# Node Streams 101
+# 1. Node Streams 101
 
 * Read stream
 * Write stream
@@ -146,7 +146,11 @@ Be notified when data is flushed (to underlying resource):
 ```js
 target.write(chunk, encoding, callback);
 
-function callback() {
+function callback(err) {
+  if (err) {
+    console.error('problem writing this chunk', err);
+  }
+  else ⁄
   console.log('this piece of data was flushed');
 }
 ```
@@ -226,6 +230,11 @@ require('net').createServer(function(conn) {
 }).listen(port);
 ```
 
+![Answer Boy](images/answer-boy.gif)
+
+
+Yup, an echo server.
+
 
 # Pipe
 
@@ -240,15 +249,17 @@ source.pipe(dest);
 
 Looks simple, but it's not. Behind the scenes it does:
 
-* Ending
-* Error handling
 * Flow control
 * Encoding / decoding
+* Ending
+* Error handling
 
 
-# Transform Streams
+# A Transform Stream
 
-Is readable and writable.
+is both readable and writable.
+
+Unlike the Duplex stream, the output depends on the input.
 
 You can use to adapt encodings, formats or types:
 
@@ -272,7 +283,7 @@ Or implement protocols
 Example:
 
 ```js
-var RPC = require('rpc');
+var RPC = require('rpc-stream');
 var service = require('./service');
 
 require('net').createServer(function(conn) {
