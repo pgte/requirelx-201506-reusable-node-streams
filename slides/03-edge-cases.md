@@ -206,7 +206,7 @@ I get whatever is written by the client.
 
 On read streams
 
-1) What happens if a read stream emits an error?
+What happens if a read stream emits an error?
 
 ```js
 var Readable = require('stream').Readable;
@@ -241,7 +241,7 @@ It doesn't end the stream.
 
 ## 2)
 
-On write streams
+... and on write streams?
 
 ```js
 var Writable = require('stream').Writable;
@@ -252,7 +252,6 @@ writable._write = function(chunk, encoding, callback) {
   process.stdout.write('W');
   setImmediate(callback);
 };
-
 
 ['finish', 'error'].forEach(function(event) {
   writable.on(event, function() {
@@ -275,7 +274,7 @@ By default, emitting an error on a write stream makes nothing extraordinary happ
 
 ## 3)
 
-...on write streams you're piping into.
+... and on write streams you're piping into?
 
 ```js
 var readable = require('./readable');
@@ -339,23 +338,157 @@ setTimeout(function() {
 ```
 
 
-Only the pipe right before gets unpiped.
+> In case of write stream error, only the pipe right before gets unpiped.
+
+Warning: dangling pipe!
 
 
-## Ending
+# Piping and Ending
 
 
-## Piping
+## 1)
 
-## Piping from many
+Piping to one:
 
-## Piping to many
+```js
+var readable = require('./readable');
+var writable = require('./writable');
+
+['finish', 'error', 'pipe', 'unpipe'].forEach(function(event) {
+  writable.on(event, function() {
+    console.log('\nwritable event: ', event);
+  });
+});
+
+['end', 'error'].forEach(function(event) {
+  readable.on(event, function() {
+    console.log('\nreadable event: ', event);
+  });
+});
+
+readable.pipe(writable);
+
+setTimeout(function() {
+  readable.push(null);
+}, 2e3);
+```
 
 
-# Ending
-
-## Piping from many
+> If a read stream ends, the write stream target also ends.
 
 
+2)
 
-## Piping to many
+Prevent target from ending:
+
+```js
+var readable = require('./readable');
+var writable = require('./writable');
+
+['finish', 'error', 'pipe', 'unpipe'].forEach(function(event) {
+  writable.on(event, function() {
+    console.log('\nwritable event: ', event);
+  });
+});
+
+['end', 'error'].forEach(function(event) {
+  readable.on(event, function() {
+    console.log('\nreadable event: ', event);
+  });
+});
+
+readable.pipe(writable, {end: false});
+
+setTimeout(function() {
+  readable.push(null);
+}, 2e3);
+```
+
+
+> `{end: false}` prevents the target from ending.
+ 
+(Also appliable to Transform streams)
+
+
+## 3)
+
+Piping from many
+
+```js
+var Readable = require('./create_readable');
+var writable = require('./writable');
+
+var readables = [Readable(), Readable()];
+
+['finish', 'error', 'pipe', 'unpipe'].forEach(function(event) {
+  writable.on(event, function() {
+    console.log('\nwritable event: ', event);
+  });
+});
+
+['end', 'error'].forEach(function(event) {
+  readables.forEach(function(readable, index) {
+    readable.on(event, function() {
+      console.log('\nreadable[%d] event: ', index, event);
+    });
+  });
+});
+
+readables.forEach(function(readable) {
+  readable.pipe(writable);
+});
+
+setTimeout(function() {
+  readables[0].push(null);
+}, 2e3);
+```
+
+
+WAT happened here?
+
+> first readable ended
+
+>   => writable finished
+
+>   => writable unpiped
+
+>   => second readable paused
+
+
+## 4)
+
+Piping to many
+
+```js
+var readable = require('./readable');
+var Writable = require('./create_writable');
+
+var writables = [Writable(), Writable()];
+
+['finish', 'error', 'pipe', 'unpipe'].forEach(function(event) {
+  writables.forEach(function(writable, index) {
+    writable.on(event, function() {
+      console.log('\nwritable[%d] event: ', index, event);
+    });
+  });
+});
+
+['end', 'error'].forEach(function(event) {
+  readable.on(event, function() {
+    console.log('\nreadable event: ', event);
+  });
+});
+
+writables.forEach(function(writable) {
+  readable.pipe(writable);
+});
+
+setTimeout(function() {
+  readable.push(null);
+}, 2e3);
+```
+
+
+> When piping to many targets, all targets finish after source ends.
+
+Seems legit.

@@ -1,4 +1,4 @@
-## require('lx')
+![requirelx](images/requirelx.jpg)
 
 # Node Reusable Streams
 
@@ -6,6 +6,8 @@
 
 
 https://pgte.github.io/requirelx-201506-reusable-node-streams
+
+http://bit.ly/1FSRPKD
 
 
 #Hello
