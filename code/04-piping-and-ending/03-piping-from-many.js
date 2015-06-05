@@ -23,4 +23,8 @@ readables.forEach(function(readable) {
 
 setTimeout(function() {
   readables[0].push(null);
+  setTimeout(function() {
+    console.log(process._getActiveHandles());
+  }, 1.5e3);
 }, 2e3);
+
